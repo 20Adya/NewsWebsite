@@ -1,6 +1,7 @@
 const API_KEY = "fe926c57336a4c8d9766f5d5b830a83a";
 const url = "https://newsapi.org/v2/everything?q=";
 
+
 window.addEventListener("load", () => fetchNews("India"));
 
 function reload() {
@@ -8,9 +9,21 @@ function reload() {
 }
 
 async function fetchNews(query) {
-    const res = await fetch(`${url}${query}&apiKey=${API_KEY}`);
-    const data = await res.json();
-    bindData(data.articles);
+    try {
+        const res = await fetch(`${url}${query}&apiKey=${API_KEY}`);
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        const data = await res.json();
+        if (data && Array.isArray(data.articles)) {
+            bindData(data.articles);
+        } else {
+            throw new Error("Invalid response structure");
+        }
+    } catch (error) {
+        console.error("Error fetching news:", error);
+        document.getElementById("cards-container").innerHTML = `<p>Error fetching news: ${error.message}</p>`;
+    }
 }
 
 function bindData(articles) {
