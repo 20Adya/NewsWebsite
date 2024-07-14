@@ -8,11 +8,33 @@ function reload() {
     window.location.reload();
 }
 
+// async function fetchNews(query) {
+//     try {
+//         const res = await fetch(`${url}${query}&apiKey=${API_KEY}`);
+//         if (!res.ok) {
+//             throw new Error(`HTTP error! status: ${res.status}`);
+//         }
+//         const data = await res.json();
+//         if (data && Array.isArray(data.articles)) {
+//             bindData(data.articles);
+//         } else {
+//             throw new Error("Invalid response structure");
+//         }
+//     } catch (error) {
+//         console.error("Error fetching news:", error);
+//         document.getElementById("cards-container").innerHTML = `<p>Error fetching news: ${error.message}</p>`;
+//     }
+// }
+
 async function fetchNews(query) {
     try {
         const res = await fetch(`${url}${query}&apiKey=${API_KEY}`);
         if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status}`);
+            if (res.status === 426) {
+                throw new Error('Upgrade Required: Please switch to a supported protocol.');
+            } else {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
         }
         const data = await res.json();
         if (data && Array.isArray(data.articles)) {
@@ -25,6 +47,7 @@ async function fetchNews(query) {
         document.getElementById("cards-container").innerHTML = `<p>Error fetching news: ${error.message}</p>`;
     }
 }
+
 
 function bindData(articles) {
     const cardsContainer = document.getElementById("cards-container");
